@@ -1,0 +1,23 @@
+[
+  {
+    "url": "https://data.spacehunters.com.br/",
+    "path": "index.html",
+    "bytes": 1167,
+    "sha256": "62b597826cf6311432d69dac58c51757427e7c4a41099833185fd07831b16be9",
+    "status": 200
+  },
+  {
+    "url": "https://data.spacehunters.com.br/assets/index-QrUd2-WL.js",
+    "path": "app.js",
+    "bytes": 2222054,
+    "sha256": "1e16804f990c2f1767355b3dd731ddb3e75447fa528d2ecda369d03d15d2f02d",
+    "status": 200
+  },
+  {
+    "url": "https://app.economapas.com.br/_javascript/printScreen_mapa_socioeconomico.js",
+    "path": "economapas.js",
+    "bytes": 1907,
+    "sha256": "6cf4bb22df86a873a634cee43450bb87156061c1b2bf75af28c934f0e2c6c327",
+    "status": 200
+  }
+]
