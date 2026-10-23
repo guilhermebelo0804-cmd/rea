@@ -75,3 +75,16 @@ test("byte decoding preserves a UTF8 BOM and rejects lossy invalid UTF8", () => 
   );
   assert.throws(() => decodePublicBytes(Buffer.from([0xc3, 0x28])));
 });
+
+test("bounded selection covers tile and geometry questions before duplicate helpers", () => {
+  const source =
+    'function a(){return {radius_m:1,type:"circle"};} function b(){return {radius_m:2};} function tiles(){return "/tiles/census/z";}';
+  const result = partitionPublicSource(source, { limit: 2 });
+  assert.equal(result.chunks.length, 2);
+  assert.ok(
+    result.chunks.some((c) => c.matched_signals.includes("geometry-contract")),
+  );
+  assert.ok(
+    result.chunks.some((c) => c.matched_signals.includes("territorial-tiles")),
+  );
+});

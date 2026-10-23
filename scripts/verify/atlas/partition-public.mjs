@@ -78,7 +78,21 @@ export function partitionPublicSource(
   );
   // With no literal matches, retain a bounded substantive syntax sample. Empty
   // semicolons are never evidence of useful application reconstruction.
-  const selected = ranked.slice(0, limit);
+  const selected = [];
+  // Cover distinct declared question families before spending the remaining
+  // budget on repeated geometry/report helpers with a high aggregate score.
+  for (const [family] of signals) {
+    if (selected.length >= limit) break;
+    if (selected.some((row) => row.matched_signals.includes(family))) continue;
+    const candidate = ranked.find((row) =>
+      row.matched_signals.includes(family),
+    );
+    if (candidate) selected.push(candidate);
+  }
+  for (const candidate of ranked) {
+    if (selected.length >= limit) break;
+    if (!selected.includes(candidate)) selected.push(candidate);
+  }
   for (const row of rows) {
     if (selected.includes(row)) row.status = "selected";
     else if (row.status === "eligible")
@@ -95,7 +109,7 @@ export function partitionPublicSource(
       end: item.end,
     })),
     selection_method:
-      "complete top-level AST statements ranked by explicit literal signals; no execution or semantics-equivalence claim",
+      "complete top-level AST statements selected for signal-family coverage, then priority and substantive size; no execution or semantics-equivalence claim",
     omitted_context:
       "Imports, surrounding statements, directives and lexical/global dependencies are not restored. Separate statement analysis is a derived static observation, not a runnable reconstruction.",
     bounds: { max_statement_bytes: maxBytes, max_selected_statements: limit },
