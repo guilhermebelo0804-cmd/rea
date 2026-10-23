@@ -4,7 +4,7 @@ Implementação testada: `9ad7946dd4c4c997216c7276a07e9cb212d5110d`. [Execução
 
 ## Entrega executada
 
-- 10 comandos reais `analyze-javascript-application`, todos com um statement não vazio efetivamente analisado, zero falhas de parse e sem esgotar memória. Cada worker permaneceu limitado a 512 MiB e 30 segundos.
+- 10 comandos reais `analyze-javascript-application`, todos com um statement não vazio efetivamente analisado, zero falhas de parse e sem esgotar memória. Cada análise usou limite de old-space V8 de 512 MiB e prazo de 30 segundos; isso não limita nem mede toda a memória RSS do processo.
 - 10 comandos reais `inspect-analysis-view` leram os resultados já salvos, sem repetir análise. A projeção de rotas retornou **zero itens reconhecidos** nos recortes. Isso não prova ausência de APIs: os wrappers Axios/minificados e o contexto externo permanecem parcialmente desconhecidos.
 - Segunda passagem comprovou checkpoints: **10 reutilizações verificadas, zero novas análises**. Identidade inclui commit REA, hash do código do planejador/runner/lockfile, hashes do original e do recorte, intervalo original e opções de recursos. O digest da projeção e do resumo também é verificado.
 - Sete regressões do particionador e 19 testes de processo/parser passaram no runner. Verificações locais de sintaxe, formatação, Python e lint focal também passaram.
@@ -59,7 +59,7 @@ As comparações acima descrevem evidências técnicas e lacunas. Não estabelec
 
 ## O que mudou em relação à falha de memória
 
-O bundle monolítico de 2.222.054 bytes havia esgotado workers de 1 GiB e 3 GiB. Nesta entrega ele **não foi reenviado integralmente** ao analisador semântico. O particionamento permitiu analisar os seis recortes escolhidos com 512 MiB por worker; imports/contexto e os bytes omitidos continuam explicitamente fora da cobertura.
+O bundle monolítico de 2.222.054 bytes havia esgotado workers de 1 GiB e 3 GiB. Nesta entrega ele **não foi reenviado integralmente** ao analisador semântico. O particionamento permitiu analisar os seis recortes escolhidos com orçamento de old-space V8 de 512 MiB por worker; imports/contexto e os bytes omitidos continuam explicitamente fora da cobertura.
 
 Tempo somado dos seis comandos produtores Space Data: **19.720 s**; dos dez produtores: **35.788 s**. Os tempos não incluem captura, instalação, build ou projeção posterior. Não são comparação de desempenho em trabalho equivalente: o escopo agora é menor. CPU, tokens e pico real de memória da família de processos não foram medidos; 512 MiB é limite configurado, não medição.
 
