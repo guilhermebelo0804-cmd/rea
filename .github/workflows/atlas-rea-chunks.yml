@@ -1,0 +1,52 @@
+name: Atlas bounded public REA chunks
+
+on:
+  push:
+    branches: ["fix/atlas-public-chunks"]
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-public-analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HUSKY: "0"
+      TURBO_CACHE: "local:rw"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Partition and process preflight regressions
+        run: |
+          node --test scripts/verify/atlas/partition-public.test.mjs
+          npm run test:local -- src/process/ProcessOwnership.prepare.test.ts src/process/LinuxProcessStat.test.ts
+      - run: npm run build:cached
+      - name: Observe bounded public pages and published same-origin assets
+        run: python3 scripts/verify/atlas/record-public-platforms.py
+      - name: Analyze exact AST statements with per-worker memory and time limits
+        run: |
+          node scripts/verify/atlas/run-public-chunks.mjs
+          cp chunk-evidence/results.json chunk-evidence/results-executed.json
+          cp chunk-evidence/verdict.json chunk-evidence/verdict-executed.json
+      - name: Verify resumable checkpoint reuse without repeating analysis
+        run: |
+          node scripts/verify/atlas/run-public-chunks.mjs
+          node --input-type=module - <<'JS'
+          import {readFileSync} from 'node:fs';
+          const v=JSON.parse(readFileSync('chunk-evidence/verdict.json','utf8'));
+          if(v.counts.executed!==0 || v.counts.cached===0)throw Error('checkpoint reuse not proven');
+          console.log(JSON.stringify(v.counts));
+          JS
+      - name: Retain checkpoint summaries and source lineage; exclude downloaded code
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-rea-chunks
+          path: chunk-evidence/
+          retention-days: 30
+          if-no-files-found: error
