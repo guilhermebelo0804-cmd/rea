@@ -1233,12 +1233,24 @@ export const createSystemProcessOwnershipHost = (
       await darwinTokens?.prepare(signal);
       if (platform === "linux") {
         try {
+          // procfs must use the same PID namespace as Node and child signals.
+          // An ancestor-mounted /proc can expose valid but unrelated PIDs; do
+          // not translate those IDs or substitute a weaker ownership check.
+          const self = parseLinuxProcessStat(
+            await readFile("/proc/self/stat", { encoding: "utf8", signal }),
+          );
+          if (self === undefined)
+            throw new Error("/proc/self/stat has no readable process identity");
+          if (self.pid !== process.pid)
+            throw new Error(
+              `PID namespace mismatch: Node PID ${String(process.pid)} differs from /proc/self/stat PID ${String(self.pid)}. Run REA with procfs mounted for its own PID namespace, or in a compatible container/VM; do not translate PIDs or disable ownership checks.`,
+            );
           const processes = await listProcesses(signal);
           if (!processes.some(({ pid }) => pid === process.pid))
             throw new Error("ps did not report REA's current process");
         } catch (cause: unknown) {
           if (isExpectedAbort(cause, signal)) throw cause;
-          const reason = `Linux process ownership inspection requires a procps-compatible ps on REA's PATH before launching a child: ${errorMessage(cause)}`;
+          const reason = `Linux process ownership inspection requires namespace-aligned procfs and a procps-compatible ps on REA's PATH before launching a child: ${errorMessage(cause)}`;
           throw new AnalysisCapabilityUnavailableError(
             "process-ownership",
             "prepare_owned_process",
