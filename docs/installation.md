@@ -370,6 +370,16 @@ procps-compatible `ps` on `PATH` before
 running those workflows. A missing or incompatible command causes a refusal
 before the supervised child starts.
 
+`/proc` must also be mounted for the PID namespace in which Node and its
+children run. If `/proc/self/stat` reports a different PID from `process.pid`,
+installing `procps` or increasing an analysis timeout cannot fix that mismatch.
+REA refuses before launching its process-table helper. Configure the container
+runtime to mount procfs in the container's own PID namespace, or run REA in a
+compatible authorized VM/container. Do not translate ancestor-namespace PIDs,
+replace `ps` with fabricated output, or disable process ownership checks. An
+unprivileged managed environment may require its operator to repair this mount;
+REA does not change namespace or mount configuration itself.
+
 The public error code varies by caller: `capability_unavailable`,
 `provider_unavailable` or `execution_failure`. Some provider adapters report
 only a generic startup error. Check this prerequisite before following

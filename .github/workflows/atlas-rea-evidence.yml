@@ -1,0 +1,55 @@
+name: Atlas REA evidence
+
+on:
+  push:
+    branches: ["fix/atlas-procfs-preflight"]
+
+permissions:
+  contents: read
+
+jobs:
+  public-analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      HUSKY: "0"
+      TURBO_CACHE: "local:rw"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Regression tests
+        run: npm run test:local -- src/process/ProcessOwnership.prepare.test.ts src/process/LinuxProcessStat.test.ts
+      - name: Build runtime
+        run: npm run build:cached
+      - name: Verify native PID namespace
+        run: |
+          mkdir -p evidence
+          node --input-type=module - <<'JS' > evidence/host.json
+          import { readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const pid = Number(readFileSync('/proc/self/stat', 'utf8').split(' ')[0]);
+          if (pid !== process.pid) throw Error('procfs PID namespace mismatch');
+          execFileSync('ps', ['-axo', 'pid=,ppid=,pgid=,uid=,stat=,command=']);
+          console.log(JSON.stringify({node:process.version,pid:process.pid,procfsPid:pid,aligned:true}));
+          JS
+      - name: Capture only published HTML and its module
+        run: python3 scripts/verify/atlas/record-public-bundle.py
+      - name: REA static application analysis
+        run: |
+          node scripts/rea.mjs analyze-javascript-application "$RUNNER_TEMP/atlas-rea-public" --source-path app.js --detail summary --evidence_output "$RUNNER_TEMP/rea-application-complete.json" --analysis-timeout-ms 120000 --format json > evidence/application-summary.json 2> evidence/application-progress.jsonl
+      - name: REA retained public HTTP capture inspection
+        run: |
+          node scripts/rea.mjs inspect-web-network-capture "$RUNNER_TEMP/atlas-rea-public.har" har --detail summary --evidence_output "$RUNNER_TEMP/rea-http-complete.json" --format json > evidence/http-summary.json 2> evidence/http-progress.jsonl
+      - name: Upload summaries and provenance, excluding downloaded bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-rea-public-evidence
+          path: evidence/
+          retention-days: 30
+          if-no-files-found: error
