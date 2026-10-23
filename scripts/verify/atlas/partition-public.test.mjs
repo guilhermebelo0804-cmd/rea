@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { parse } from "@babel/parser";
-import { partitionPublicSource, sha256 } from "./partition-public.mjs";
+import {
+  partitionPublicSource,
+  sha256,
+  decodePublicBytes,
+} from "./partition-public.mjs";
 
 test("preserves exact whole-statement source, UTF16 and byte lineage with Unicode", () => {
   const source =
@@ -48,4 +52,26 @@ test("ranking and identities are deterministic; never evaluates captured code", 
 test("fails on invalid syntax and invalid resource bounds instead of byte splitting", () => {
   assert.throws(() => partitionPublicSource("const {"));
   assert.throws(() => partitionPublicSource("const x=1", { limit: 0 }));
+});
+
+test("excludes empty semicolons and retains a substantive bounded fallback", () => {
+  const result = partitionPublicSource(
+    "; const x=1; function larger(){return x + 2;}",
+    { limit: 1 },
+  );
+  assert.equal(result.statements[0].status, "excluded-empty-statement");
+  assert.equal(result.chunks[0].type, "FunctionDeclaration");
+  assert.equal(partitionPublicSource(";;;", { limit: 1 }).chunks.length, 0);
+});
+
+test("byte decoding preserves a UTF8 BOM and rejects lossy invalid UTF8", () => {
+  const bytes = Buffer.from('\ufeffconst ação="renda";');
+  const source = decodePublicBytes(bytes);
+  assert.equal(sha256(Buffer.from(source)), sha256(bytes));
+  const chunk = partitionPublicSource(source).chunks[0];
+  assert.equal(
+    bytes.subarray(chunk.byte_start, chunk.byte_end).toString(),
+    chunk.text,
+  );
+  assert.throws(() => decodePublicBytes(Buffer.from([0xc3, 0x28])));
 });

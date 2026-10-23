@@ -5,7 +5,8 @@ export const sha256 = (value) =>
   createHash("sha256").update(value).digest("hex");
 
 const signals = [
-  ["area-contract", /\/analytics\/|analyzeArea|radius_m|country_code/u, 10],
+  ["geometry-contract", /radius_m|type:\s*[`"'](?:circle|polygon)/u, 20],
+  ["area-contract", /\/analytics\/|analyzeArea/u, 10],
   [
     "territorial-tiles",
     /\/tiles\/(?:consumption|census|boundaries)|dataVersion/u,
@@ -19,6 +20,16 @@ const signals = [
     4,
   ],
 ];
+
+export function decodePublicBytes(bytes) {
+  const source = new TextDecoder("utf-8", {
+    fatal: true,
+    ignoreBOM: true,
+  }).decode(bytes);
+  if (!Buffer.from(source).equals(bytes))
+    throw Error("UTF8 decoding changed source bytes");
+  return source;
+}
 
 /** Select complete Program statements only. Never split declarations/functions. */
 export function partitionPublicSource(
@@ -53,16 +64,20 @@ export function partitionPublicSource(
       matched_signals: matched.map(([name]) => name),
       priority: matched.reduce((sum, [, , score]) => sum + score, 0),
       status:
-        Buffer.byteLength(text) > maxBytes
-          ? "excluded-oversized-atomic-statement"
-          : "eligible",
+        node.type === "EmptyStatement"
+          ? "excluded-empty-statement"
+          : Buffer.byteLength(text) > maxBytes
+            ? "excluded-oversized-atomic-statement"
+            : "eligible",
     };
   });
   const eligible = rows.filter((row) => row.status === "eligible");
   const ranked = [...eligible].sort(
-    (a, b) => b.priority - a.priority || a.ordinal - b.ordinal,
+    (a, b) =>
+      b.priority - a.priority || b.bytes - a.bytes || a.ordinal - b.ordinal,
   );
-  // No matches is not a negative finding. Inspect a bounded leading syntax sample.
+  // With no literal matches, retain a bounded substantive syntax sample. Empty
+  // semicolons are never evidence of useful application reconstruction.
   const selected = ranked.slice(0, limit);
   for (const row of rows) {
     if (selected.includes(row)) row.status = "selected";

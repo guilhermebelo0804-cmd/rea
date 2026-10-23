@@ -2,7 +2,11 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { partitionPublicSource, sha256 } from "./partition-public.mjs";
+import {
+  partitionPublicSource,
+  sha256,
+  decodePublicBytes,
+} from "./partition-public.mjs";
 
 const execute = promisify(execFile);
 const output = resolve("chunk-evidence");
@@ -98,7 +102,9 @@ async function analyzeChunk({ asset, platform, chunk }) {
     const candidate = JSON.parse(await readFile(checkpointPath, "utf8"));
     if (
       candidate.key === key &&
-      sha256(JSON.stringify(candidate.summary)) === candidate.summary_sha256
+      sha256(JSON.stringify(candidate.summary)) === candidate.summary_sha256 &&
+      sha256(JSON.stringify(candidate.route_view)) ===
+        candidate.route_view_sha256
     )
       cached = candidate;
   } catch {
@@ -121,6 +127,7 @@ async function analyzeChunk({ asset, platform, chunk }) {
     completePath,
   );
   const stats = summary.summary?.normalized_result?.summary?.statistics;
+  const route_view = await projectRoutes(summary, completePath);
   const record = {
     key,
     identity,
@@ -153,12 +160,50 @@ async function analyzeChunk({ asset, platform, chunk }) {
         : "analysis-incomplete",
     summary,
     summary_sha256: sha256(JSON.stringify(summary)),
+    route_view,
+    route_view_sha256: sha256(JSON.stringify(route_view)),
     stderr_digest: sha256(stderr),
     stderr_bytes: Buffer.byteLength(stderr),
   };
   await writeFile(checkpointPath + ".tmp", JSON.stringify(record, null, 2));
   await rename(checkpointPath + ".tmp", checkpointPath);
   return record;
+}
+
+async function projectRoutes(summary, completePath) {
+  const parentId = summary.summary?.normalized_result?.parent_evidence_id;
+  if (!parentId) return { outcome: "no-retained-parent" };
+  const request = {
+    source: { kind: "retained-evidence", evidence_id: parentId },
+    view: {
+      kind: "javascript-routes",
+      collection: "routes",
+      fields: ["path", "confidence"],
+      limit: 40,
+    },
+  };
+  try {
+    const result = await execute(
+      process.execPath,
+      [
+        "scripts/rea.mjs",
+        "inspect-analysis-view",
+        JSON.stringify(request),
+        "--evidence-bundle",
+        completePath,
+        "--format",
+        "json",
+      ],
+      { timeout: 15000, maxBuffer: 2 * 1024 * 1024 },
+    );
+    return { outcome: "projected", evidence: JSON.parse(result.stdout) };
+  } catch (error) {
+    return {
+      outcome: "projection-unavailable",
+      code: typeof error.code === "number" ? error.code : -1,
+      output_bytes: Buffer.byteLength(error.stdout || ""),
+    };
+  }
 }
 
 for (const platform of platforms) {
@@ -168,11 +213,13 @@ for (const platform of platforms) {
       if (sha256(bytes) !== asset.sha256)
         throw Error("source capture digest mismatch");
       // Reject invalid UTF8; replacement decoding would break original byte lineage.
-      const source = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      const source = decodePublicBytes(bytes);
       const plan = partitionPublicSource(source, {
         maxBytes: options.maxStatementBytes,
         limit: platform.platform === "spacedata" ? 6 : 1,
       });
+      if (plan.source_sha256 !== asset.sha256)
+        throw Error("partition source identity mismatch");
       manifest.push({
         platform: platform.platform,
         source_url: asset.url,
