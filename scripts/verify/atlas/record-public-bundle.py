@@ -19,12 +19,12 @@ target = Path(os.environ["RUNNER_TEMP"]) / "atlas-rea-public"
 target.mkdir()
 
 
-def record(url, filename):
+def record(url, filename, allowed_host="data.spacehunters.com.br"):
     started = datetime.datetime.now(datetime.timezone.utc).isoformat()
     tick = time.monotonic()
     request = urllib.request.Request(url, headers={"User-Agent": "AtlasResearch/1.0"})
     with urllib.request.urlopen(request, timeout=30) as response:
-        if urllib.parse.urlsplit(response.url).netloc != "data.spacehunters.com.br":
+        if urllib.parse.urlsplit(response.url).netloc != allowed_host:
             raise ValueError("redirect outside selected public origin")
         body = response.read(LIMIT_BYTES + 1)
         if len(body) > LIMIT_BYTES:
@@ -73,6 +73,8 @@ parts = urllib.parse.urlsplit(bundle_url)
 if parts.scheme != "https" or parts.netloc != "data.spacehunters.com.br" or not parts.path.startswith("/assets/"):
     raise ValueError("module outside selected published asset scope")
 record(bundle_url, "app.js")
+record("https://app.economapas.com.br/_javascript/printScreen_mapa_socioeconomico.js",
+       "economapas.js", "app.economapas.com.br")
 Path("evidence/provenance.json").write_text(json.dumps(provenance, indent=2))
 Path(os.environ["RUNNER_TEMP"], "atlas-rea-public.har").write_text(json.dumps({
     "log": {"version": "1.2", "creator": {"name": "Atlas urllib recorder", "version": "1"},

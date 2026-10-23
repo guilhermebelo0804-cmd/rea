@@ -39,9 +39,18 @@ jobs:
           JS
       - name: Capture only published HTML and its module
         run: python3 scripts/verify/atlas/record-public-bundle.py
-      - name: REA static application analysis
+      - name: REA complete selected public module analysis
         run: |
-          node scripts/rea.mjs analyze-javascript-application "$RUNNER_TEMP/atlas-rea-public" --source-path app.js --detail summary --evidence_output "$RUNNER_TEMP/rea-application-complete.json" --analysis-timeout-ms 120000 --format json > evidence/application-summary.json 2> evidence/application-progress.jsonl
+          node scripts/rea.mjs analyze-javascript-application "$RUNNER_TEMP/atlas-rea-public" --source-path economapas.js --detail summary --evidence_output "$RUNNER_TEMP/rea-small-complete.json" --analysis-timeout-ms 60000 --format json > evidence/small-module-summary.json 2> evidence/small-module-progress.jsonl
+          node --input-type=module - <<'JS'
+          import { readFileSync } from 'node:fs';
+          const r = JSON.parse(readFileSync('evidence/small-module-summary.json', 'utf8')).summary.normalized_result.summary;
+          if (r.statistics.parsed_javascript_files !== 1 || r.statistics.parse_failures !== 0) throw Error('selected public module not parsed completely');
+          console.log(JSON.stringify({statistics:r.statistics, coverage:r.coverage}));
+          JS
+      - name: REA static application analysis (documented 3 GiB budget)
+        run: |
+          node scripts/rea.mjs analyze-javascript-application "$RUNNER_TEMP/atlas-rea-public" --source-path app.js --max-heap-mb 3072 --detail summary --evidence_output "$RUNNER_TEMP/rea-application-complete.json" --analysis-timeout-ms 120000 --format json > evidence/application-summary.json 2> evidence/application-progress.jsonl
       - name: REA retained public HTTP capture inspection
         run: |
           node scripts/rea.mjs inspect-web-network-capture "$RUNNER_TEMP/atlas-rea-public.har" har --detail summary --evidence_output "$RUNNER_TEMP/rea-http-complete.json" --format json > evidence/http-summary.json 2> evidence/http-progress.jsonl
