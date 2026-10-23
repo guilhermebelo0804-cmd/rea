@@ -1,0 +1,15 @@
+{
+  "options": {
+    "maxHeapMb": 512,
+    "perSourceTimeoutMs": 30000,
+    "maxStatementBytes": 30000
+  },
+  "counts": {
+    "selected_statements": 10,
+    "parsed_statements": 10,
+    "incomplete": 0,
+    "executed": 0,
+    "cached": 10
+  },
+  "limitation": "Exact source statements were parsed in isolation, with original offsets/hashes retained. No whole-module reconstruction, runtime execution, API reachability or proprietary model equivalence is established."
+}

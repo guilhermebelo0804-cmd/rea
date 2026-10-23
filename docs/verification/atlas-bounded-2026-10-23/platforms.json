@@ -1,0 +1,186 @@
+[
+  {
+    "platform": "spacedata",
+    "surface": "public application entry",
+    "page": "https://data.spacehunters.com.br/",
+    "assets": [
+      {
+        "url": "https://data.spacehunters.com.br/assets/index-QrUd2-WL.js",
+        "final_url": "https://data.spacehunters.com.br/assets/index-QrUd2-WL.js",
+        "status": 200,
+        "bytes": 2222054,
+        "sha256": "1e16804f990c2f1767355b3dd731ddb3e75447fa528d2ecda369d03d15d2f02d",
+        "observed_at": "2026-10-23T16:49:19.405955+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/spacedata-0.js"
+      }
+    ],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/assets/",
+      "asset_budget": 1
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://data.spacehunters.com.br/",
+      "final_url": "https://data.spacehunters.com.br/",
+      "status": 200,
+      "bytes": 1167,
+      "sha256": "62b597826cf6311432d69dac58c51757427e7c4a41099833185fd07831b16be9",
+      "observed_at": "2026-10-23T16:49:17.604221+00:00"
+    },
+    "eligible_script_count": 1
+  },
+  {
+    "platform": "eyeonfit",
+    "surface": "public product page, not authenticated application",
+    "page": "https://www.eyeonfit.com/onde-abrir-academia",
+    "assets": [
+      {
+        "url": "https://www.eyeonfit.com/_next/static/chunks/3x413o9ijfm77.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "final_url": "https://www.eyeonfit.com/_next/static/chunks/3x413o9ijfm77.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "status": 200,
+        "bytes": 28131,
+        "sha256": "2870363f5cd1abfc977ed2e6c6ab9eeefc3851ca445d2bce64c0bce886017e74",
+        "observed_at": "2026-10-23T16:49:21.014401+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/eyeonfit-0.js"
+      },
+      {
+        "url": "https://www.eyeonfit.com/_next/static/chunks/3quty82e5cnv8.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "final_url": "https://www.eyeonfit.com/_next/static/chunks/3quty82e5cnv8.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "status": 200,
+        "bytes": 34986,
+        "sha256": "09908e49225dfb38da87f6140c3d5319c95bb888a2cbde49a384f4a07f488c04",
+        "observed_at": "2026-10-23T16:49:21.149609+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/eyeonfit-1.js"
+      },
+      {
+        "url": "https://www.eyeonfit.com/_next/static/chunks/0eis0e-v7pfgq.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "final_url": "https://www.eyeonfit.com/_next/static/chunks/0eis0e-v7pfgq.js?dpl=dpl_ExX8QGkg99JLc2TY4yJViHGE1mDj",
+        "status": 200,
+        "bytes": 57143,
+        "sha256": "a3fe8926d6e35074314d3120dc1574b44ad4bbfa881629bed97d9cc35eae92cc",
+        "observed_at": "2026-10-23T16:49:21.314072+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/eyeonfit-2.js"
+      }
+    ],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/_next/static/chunks/",
+      "asset_budget": 3
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://www.eyeonfit.com/onde-abrir-academia",
+      "final_url": "https://www.eyeonfit.com/onde-abrir-academia",
+      "status": 200,
+      "bytes": 229599,
+      "sha256": "e2f17a8a076fc1f524c45a75523185e0b254ca3dc5915808c1900b32e77e1a50",
+      "observed_at": "2026-10-23T16:49:20.833916+00:00"
+    },
+    "eligible_script_count": 16
+  },
+  {
+    "platform": "economapas",
+    "surface": "public application entry with selected print helper",
+    "page": "https://app.economapas.com.br/",
+    "assets": [
+      {
+        "url": "https://app.economapas.com.br/_javascript/printScreen_mapa_socioeconomico.js",
+        "final_url": "https://app.economapas.com.br/_javascript/printScreen_mapa_socioeconomico.js",
+        "status": 200,
+        "bytes": 1907,
+        "sha256": "6cf4bb22df86a873a634cee43450bb87156061c1b2bf75af28c934f0e2c6c327",
+        "observed_at": "2026-10-23T16:49:23.155017+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/economapas-0.js"
+      }
+    ],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/_javascript/printScreen_mapa_socioeconomico.js",
+      "asset_budget": 1
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://app.economapas.com.br/",
+      "final_url": "https://app.economapas.com.br/",
+      "status": 200,
+      "bytes": 177161,
+      "sha256": "5beb3b8d3a7a862eeffe11fbe5a1dd4f2106cc54d1becc1e475e870f727aa78d",
+      "observed_at": "2026-10-23T16:49:22.537109+00:00"
+    },
+    "eligible_script_count": 1
+  },
+  {
+    "platform": "geofusion",
+    "surface": "institutional website, not OnMaps application",
+    "page": "https://geofusion.com.br/",
+    "assets": [
+      {
+        "url": "https://geofusion.com.br/wp-content/themes/geofusion/js/jquery-1.11.1.min.js",
+        "final_url": "https://geofusion.com.br/wp-content/themes/geofusion/js/jquery-1.11.1.min.js",
+        "status": 200,
+        "bytes": 95269,
+        "sha256": "16869b9ee523535b142eaed09e266e9c912a3842a6f5c27751177043aff06f9e",
+        "observed_at": "2026-10-23T16:49:23.848236+00:00",
+        "path": "/home/runner/work/_temp/atlas-public-platforms/geofusion-0.js"
+      }
+    ],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/wp-content/themes/",
+      "asset_budget": 1
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://geofusion.com.br/",
+      "final_url": "https://geofusion.com.br/",
+      "status": 200,
+      "bytes": 79355,
+      "sha256": "b04c4b13c1056f74de1c36fa87671b9b49b6406d417b9ce7be7417b43561e3e3",
+      "observed_at": "2026-10-23T16:49:23.522869+00:00"
+    },
+    "eligible_script_count": 1
+  },
+  {
+    "platform": "nology",
+    "surface": "institutional product page",
+    "page": "https://nology.com.br/economapas/",
+    "assets": [],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/wp-content/",
+      "asset_budget": 1
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://nology.com.br/economapas/",
+      "final_url": "https://nology.com.br/economapas/",
+      "status": 200,
+      "bytes": 454094,
+      "sha256": "72aa437040341994b4c1ba261d3060fcf5f01340c3f4d426007f5c560d10e57f",
+      "observed_at": "2026-10-23T16:49:24.389492+00:00"
+    },
+    "eligible_script_count": 0
+  },
+  {
+    "platform": "spacehunters",
+    "surface": "institutional consultancy page, not Space Data application",
+    "page": "https://www.spacehunters.com.br/consultoria",
+    "assets": [],
+    "errors": [],
+    "selection": {
+      "same_origin_path_prefix": "/",
+      "asset_budget": 1
+    },
+    "limits": "Unselected/external scripts and authenticated surfaces remain unknown",
+    "page_observation": {
+      "url": "https://www.spacehunters.com.br/consultoria",
+      "final_url": "https://www.spacehunters.com.br/consultoria",
+      "status": 200,
+      "bytes": 793897,
+      "sha256": "62fa82043561dcd0045832d82b60325a941fe3b558ce5d5f6fcbf5167c0dc194",
+      "observed_at": "2026-10-23T16:49:25.025177+00:00"
+    },
+    "eligible_script_count": 0
+  }
+]
